@@ -55,7 +55,8 @@ func (s7Client *S7Comm) Stop() error {
 }
 
 func (s7Client *S7Comm) Init() error {
-	return nil
+	err := s7Client.Connect()
+	return err
 }
 
 func (s7Client *S7Comm) SampleConfig() string {
