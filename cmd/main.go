@@ -7,9 +7,8 @@ import (
 	"time"
 
 	// TODO: import your plugins
-	_ "github.com/nicolasme/s7comm/plugins/inputs/s7comm"
-
 	"github.com/influxdata/telegraf/plugins/common/shim"
+	_ "github.com/nicolasme/s7comm/plugins/inputs/s7comm"
 )
 
 var pollInterval = flag.Duration("poll_interval", 1*time.Second, "how often to send metrics")
