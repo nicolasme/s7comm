@@ -22,3 +22,6 @@ type S7Comm struct {
 	// req    *ua.ReadRequest
 	// opts   []opcua.Option
 }
+
+func init() {
+}
