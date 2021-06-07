@@ -7,7 +7,7 @@ import (
 	"time"
 
 	// TODO: import your plugins
-	// _ "github.com/my_github_user/my_plugin_repo/plugins/inputs/mypluginname"
+	_ "github.com/nicolasme/s7comm/plugins/inputs/s7comm"
 
 	"github.com/influxdata/telegraf/plugins/common/shim"
 )
