@@ -57,7 +57,7 @@ func (s7Client *S7Comm) Stop() error {
 // Add this plugin to telegraf
 func init() {
 	inputs.Add("s7comm", func() telegraf.Input {
-		return &s7Client{
+		return &S7Comm{
 			MetricName:  "s7comm",
 			Endpoint:    "opc.tcp://localhost:4840",
 			Rack:        "0",
