@@ -59,9 +59,9 @@ func init() {
 	inputs.Add("s7comm", func() telegraf.Input {
 		return &S7Comm{
 			MetricName:  "s7comm",
-			Endpoint:    "opc.tcp://localhost:4840",
-			Rack:        "0",
-			Slot:        "2",
+			Endpoint:    "192.168.10.58",
+			Rack:        0,
+			Slot:        2,
 			Timeout:     config.Duration(5 * time.Second),
 			IdleTimeout: config.Duration(10 * time.Second),
 		}
