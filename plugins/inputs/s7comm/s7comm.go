@@ -54,6 +54,31 @@ func (s7Client *S7Comm) Stop() error {
 	return err
 }
 
+func (s7Client *S7Comm) Init() error {
+	return nil
+}
+
+func (s7Client *S7Comm) SampleConfig() string {
+	return `
+  	## Generates random numbers
+		[[inputs.s7comm]]
+		# name = "S7300"
+		# plc_ip = "192.168.10.58"
+		# plc_rack = 0
+		# plc_slot = 2
+		# connect_timeout = 10s
+		# request_timeout = 2s
+`
+}
+
+func (s7Client *S7Comm) Gather(a telegraf.Accumulator) error {
+	return nil
+}
+
+func (s7Client *S7Comm) Description() string {
+	return "Read data from SIemens PLC using S7Go"
+}
+
 // Add this plugin to telegraf
 func init() {
 	inputs.Add("s7comm", func() telegraf.Input {
