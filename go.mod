@@ -1,4 +1,4 @@
-module cmd/main.go
+module github.com/nicolasme/s7comm
 
 go 1.16
 
