@@ -19,10 +19,8 @@ type S7Comm struct {
 	Timeout     config.Duration `toml:"connect_timeout"`
 	IdleTimeout config.Duration `toml:"request_timeout"`
 
-	Nodes []NodeSettings `toml:"nodes"`
-	// Nodes []string `toml:"nodes"`
-
-	Log telegraf.Logger `toml:"-"`
+	Nodes []NodeSettings  `toml:"nodes"`
+	Log   telegraf.Logger `toml:"-"`
 
 	// internal values
 	handler *gos7.TCPClientHandler
@@ -31,18 +29,10 @@ type S7Comm struct {
 }
 
 type NodeSettings struct {
-	Name string `toml:"name"`
-	Type string `toml:"type"`
+	Name    string `toml:"name"`
+	Address string `toml:"address"`
+	Type    string `toml:"type"`
 }
-
-// type NodeSettings struct {
-// 	Name   string `toml:"name"`
-// 	Area   int    `toml:"area"`
-// 	Db     int    `toml:"db"`
-// 	Start  int    `toml:"start"`
-// 	Amount int    `toml:"amount"`
-// 	Length int    `toml:"length"`
-// }
 
 func (s *S7Comm) Connect() error {
 	s.handler = gos7.NewTCPClientHandler(s.Endpoint, s.Rack, s.Slot)
@@ -54,19 +44,13 @@ func (s *S7Comm) Connect() error {
 		return err
 	}
 
-	defer s.handler.Close()
+	// defer s.handler.Close()
 
 	s.client = gos7.NewClient(s.handler)
 
 	s.Log.Info("Connexion successfull")
 
-	s.InitVars()
-
 	return nil
-}
-
-func (s *S7Comm) Read() {
-
 }
 
 func (s *S7Comm) Stop() error {
@@ -90,92 +74,69 @@ func (s *S7Comm) SampleConfig() string {
 		# plc_slot = 2
 		# connect_timeout = 10s
 		# request_timeout = 2s
-		# test1 = 1
-		# nodes = [
-		#	{name="test", area=131, db=1, start=0, amount=1, length=2},
-		#	{name="test2", area=131, db=1, start=2, amount=1, length=2},
-		# ]
+		# nodes = [{name= "DB1.DBW0", type = "int"}, 
+        # {name= "DB1.DBD2", type = "real"},
+        # {name= "DB1.DBD6", type = "real"}, 
+        # {name= "DB1.DBX10.0", type = "bool"}, 
+        # {name= "DB1.DBD12", type = "dint"}, 
+        # {name= "DB1.DBW16", type = "uint"}, 
+        # {name= "DB1.DBD18", type = "udint"}, 
+        # {name= "DB1.DBD22", type = "time"}]
 `
 }
 
-type S7Result struct {
-	Buf [4]byte
-	Err string
-}
-
-func (s *S7Comm) InitVars() {
-
-	buf := make([]byte, 4)
+func (s *S7Comm) Gather(a telegraf.Accumulator) error {
 
 	for _, node := range s.Nodes {
-		res, err := s.client.Read(node.Name, buf)
+
+		buf := make([]byte, 4)
+		fields := make(map[string]interface{})
+
+		_, err := s.client.Read(node.Address, buf)
 
 		if err != nil {
 			s.Log.Error(err)
 		} else {
-			if node.Type != "real" {
-				s.Log.Infof("Read %s : %d", node.Name, res)
-			} else {
-				t := s.helper.GetRealAt(buf, 0)
-				s.Log.Infof("Read %s : %.2f", node.Name, t)
+			switch dataType := node.Type; dataType {
+			case "bool":
+				var res bool
+				s.helper.GetValueAt(buf, 0, &res)
+				fields = map[string]interface{}{"value": res}
+			case "int":
+				var res int16
+				s.helper.GetValueAt(buf, 0, &res)
+				fields = map[string]interface{}{"value": res}
+			case "dint":
+				var res int32
+				s.helper.GetValueAt(buf, 0, &res)
+				fields = map[string]interface{}{"value": res}
+			case "uint":
+				var res uint16
+				s.helper.GetValueAt(buf, 0, &res)
+				fields = map[string]interface{}{"value": res}
+			case "udint":
+				var res uint32
+				s.helper.GetValueAt(buf, 0, &res)
+				fields = map[string]interface{}{"value": res}
+			case "real":
+				var res float32
+				s.helper.GetValueAt(buf, 0, &res)
+				fields = map[string]interface{}{"value": res}
+			case "time":
+				var res uint32
+				s.helper.GetValueAt(buf, 0, &res)
+				fields = map[string]interface{}{"value": res}
+			default:
+				s.Log.Error("Type error - ", node.Type)
+				fields = nil
+			}
+
+			if fields != nil {
+				a.AddFields(node.Name, fields, nil)
 			}
 		}
 	}
-}
 
-// func (s *S7Comm) InitVars() {
-
-// 	var items = []gos7.S7DataItem{}
-// 	var results = []S7Result{}
-
-// 	s.nodes = append(s.nodes, NodeSettings{
-// 		Name:   "test",
-// 		Area:   0x84,
-// 		Db:     1,
-// 		Start:  0,
-// 		Amount: 1,
-// 		Length: 4,
-// 	})
-
-// 	s.nodes = append(s.nodes, NodeSettings{
-// 		Name:   "test2",
-// 		Area:   0x84,
-// 		Db:     1,
-// 		Start:  2,
-// 		Amount: 1,
-// 		Length: 4,
-// 	})
-
-// 	for i, node := range s.nodes {
-// 		s.Log.Infof("Read name : %s", node.Name)
-// 		results = append(results, S7Result{Buf: [4]byte{}, Err: ""})
-// 		items = append(items, gos7.S7DataItem{
-// 			Area:     node.Area,
-// 			WordLen:  node.Length,
-// 			DBNumber: node.Db,
-// 			Start:    node.Start,
-// 			Amount:   node.Amount,
-// 			Data:     results[i].Buf[:],
-// 			Error:    results[i].Err,
-// 		})
-// 	}
-
-// 	err := s.client.AGReadMulti(items, 2)
-// 	if err != nil {
-// 		s.Log.Error(err)
-// 	}
-
-// 	for _, res := range results {
-// 		s.Log.Infof("Read buf : %d", res.Buf)
-
-// 		t := binary.BigEndian.Uint16(res.Buf[:])
-// 		s.Log.Infof("Read int : %d", t)
-
-// 		// t2 := binary.
-// 	}
-// }
-
-func (s *S7Comm) Gather(a telegraf.Accumulator) error {
 	return nil
 }
 
