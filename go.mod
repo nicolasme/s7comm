@@ -9,5 +9,5 @@ require (
 )
 
 // replace (
-// 	github.com/nicolasme/s7comm/plugins/inputs/s7comm => ./plugings/inputs/s7comm
+// 	github.com/nicolasme/s7comm/plugins/inputs/s7comm => ./plugins/inputs/s7comm
 // )
