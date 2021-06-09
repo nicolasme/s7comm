@@ -7,7 +7,7 @@ S7comm is a [telegraf](https://github.com/influxdata/telegraf) external input pl
 Download the repo
 
 ```bash
-git@github.com:nicolasme/s7comm.git
+git clone git@github.com:nicolasme/s7comm.git
 ```
 
 Change the poll interval if needed in the cmd/main.go file
@@ -30,14 +30,14 @@ Create your plugin.config file
 	plc_ip = "192.168.10.57"
 	plc_rack = 0
 	plc_slot = 1
-    connect_timeout = "10s"
-    request_timeout = "2s"
-    nodes = [{name= "test_int", address= "DB1.DBW0", type = "int"},
-        {name= "test_real", address= "DB1.DBD2",type = "real"},
-        {name= "test_bool", address= "DB1.DBX10.0",type = "bool"},
-        {name= "test_dint", address= "DB1.DBD12",type = "dint"},
-        {name= "test_uint", address= "DB1.DBW16",type = "uint"},
-        {name= "test_udint", address= "DB1.DBD18",type = "udint"}]
+    	connect_timeout = "10s"
+    	request_timeout = "2s"
+    	nodes = [{name= "test_int", address= "DB1.DBW0", type = "int"},
+        	{name= "test_real", address= "DB1.DBD2",type = "real"},
+        	{name= "test_bool", address= "DB1.DBX10.0",type = "bool"},
+        	{name= "test_dint", address= "DB1.DBD12",type = "dint"},
+        	{name= "test_uint", address= "DB1.DBW16",type = "uint"},
+        	{name= "test_udint", address= "DB1.DBD18",type = "udint"}]
 ```
 
 From here, you can already test the plugin with your config file.
