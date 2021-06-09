@@ -89,8 +89,8 @@ func (s *S7Comm) Gather(a telegraf.Accumulator) error {
 
 	for _, node := range s.Nodes {
 
+		var fields map[string]interface{}
 		buf := make([]byte, 4)
-		fields := make(map[string]interface{})
 
 		_, err := s.client.Read(node.Address, buf)
 
@@ -101,38 +101,50 @@ func (s *S7Comm) Gather(a telegraf.Accumulator) error {
 			case "bool":
 				var res bool
 				s.helper.GetValueAt(buf, 0, &res)
-				fields = map[string]interface{}{"value": res}
+				fields = map[string]interface{}{node.Name: res}
+			case "byte":
+				var res byte
+				s.helper.GetValueAt(buf, 0, &res)
+				fields = map[string]interface{}{node.Name: res}
+			case "word":
+				var res uint16
+				s.helper.GetValueAt(buf, 0, &res)
+				fields = map[string]interface{}{node.Name: res}
+			case "dword":
+				var res uint32
+				s.helper.GetValueAt(buf, 0, &res)
+				fields = map[string]interface{}{node.Name: res}
 			case "int":
 				var res int16
 				s.helper.GetValueAt(buf, 0, &res)
-				fields = map[string]interface{}{"value": res}
+				fields = map[string]interface{}{node.Name: res}
 			case "dint":
 				var res int32
 				s.helper.GetValueAt(buf, 0, &res)
-				fields = map[string]interface{}{"value": res}
+				fields = map[string]interface{}{node.Name: res}
 			case "uint":
 				var res uint16
 				s.helper.GetValueAt(buf, 0, &res)
-				fields = map[string]interface{}{"value": res}
+				fields = map[string]interface{}{node.Name: res}
 			case "udint":
 				var res uint32
 				s.helper.GetValueAt(buf, 0, &res)
-				fields = map[string]interface{}{"value": res}
+				fields = map[string]interface{}{node.Name: res}
 			case "real":
 				var res float32
 				s.helper.GetValueAt(buf, 0, &res)
-				fields = map[string]interface{}{"value": res}
+				fields = map[string]interface{}{node.Name: res}
 			case "time":
 				var res uint32
 				s.helper.GetValueAt(buf, 0, &res)
-				fields = map[string]interface{}{"value": res}
+				fields = map[string]interface{}{node.Name: res}
 			default:
 				s.Log.Error("Type error - ", node.Type)
 				fields = nil
 			}
 
 			if fields != nil {
-				a.AddFields(node.Name, fields, nil)
+				a.AddFields(s.MetricName, fields, nil)
 			}
 		}
 	}
