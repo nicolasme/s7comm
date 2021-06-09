@@ -7,7 +7,7 @@ S7comm is a [telegraf](https://github.com/influxdata/telegraf) external input pl
 Download the repo
 
 ```bash
-git@github.com:nicolasme/s7comm.git
+git clone git@github.com:nicolasme/s7comm.git
 ```
 
 Change the poll interval if needed in the cmd/main.go file
