@@ -11,7 +11,7 @@ import (
 	_ "github.com/nicolasme/s7comm/plugins/inputs/s7comm"
 )
 
-var pollInterval = flag.Duration("poll_interval", 10*time.Second, "how often to send metrics")
+var pollInterval = flag.Duration("poll_interval", 1*time.Second, "how often to send metrics")
 var pollIntervalDisabled = flag.Bool("poll_interval_disabled", false, "set to true to disable polling. You want to use this when you are sending metrics on your own schedule")
 var configFile = flag.String("config", "", "path to the config file for this plugin")
 var err error
