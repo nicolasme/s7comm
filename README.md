@@ -54,6 +54,12 @@ test_int value=8056i 1623227848846884706
 test_real value=403.14764404296875 1623227849849296642
 ```
 
+## Datatypes
+
+You have to specifie the data type in your config file for each node. At the moment, only those types are implemented :
+
+bool, byte, word, dword, int, dint, uint, udint, real, time
+
 ## Telegraf configuration
 
 To use the plugin with telegraf, add this configuration to your main telegraf.conf file. S7comm is an external plugin using [shim](https://github.com/influxdata/telegraf/blob/master/plugins/common/shim/README.md) and [execd](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/execd). Go see their doc for more information.
